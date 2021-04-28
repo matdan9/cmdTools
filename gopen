@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 gh=$(cat ./.git/config | grep url)
 url=$(echo $gh | cut -d " " -f 3)

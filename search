@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 echo "going: https://www.google.com/search?client=firefox-b-d&q=$*"
 old="$IFS"
 IFS="+"
