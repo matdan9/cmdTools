@@ -14,4 +14,4 @@ then
 fi
 
 pandoc $1 --from=gfm -t html -o /tmp/semdtmp.html
-firefox --new-window file:///tmp/semdtmp.html
+firefox --new-tab file:///tmp/semdtmp.html
