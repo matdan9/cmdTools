@@ -1,6 +1,14 @@
 #!/bin/sh
 
-gh=$(cat ./.git/config | grep url)
-url=$(echo $gh | cut -d " " -f 3)
+url=$(git remote get-url --all origin)
+gPart=$(echo $url | cut -d ":" -f 1)
+
+# handle ssh url if the case
+if [ "$gPart" != "https" ]
+then
+	path=$(echo $url | cut -d ":" -f 2)
+	url="https://github.com/$path"
+fi
+
 echo "opening $url"
 exec firefox --new-tab "$url"
