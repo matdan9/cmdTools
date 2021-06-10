@@ -1,0 +1,17 @@
+#!/bin/sh
+
+
+users=$(git shortlog -s)
+i=2
+step=2
+u=$(echo $users | cut -d " " -f $i)
+echo $u
+while [ -n "$u" ]
+do
+	i=$(($i+$step))
+	u=$(echo $users | cut -d " " -f $i)
+	c=$(git log --author="$u" --pretty=tformat: --numstat | cut -d " " -f 1)
+	echo $c
+	
+	exit 1
+done

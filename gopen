@@ -6,8 +6,9 @@ gPart=$(echo $url | cut -d ":" -f 1)
 # handle ssh url if the case
 if [ "$gPart" != "https" ]
 then
-	path=$(echo $url | cut -d ":" -f 2)
-	url="https://github.com/$path"
+	url=$(echo $url | cut -d "@" -f 2)
+	url=$(echo $url | tr ':' '/')
+	url="https://$url"
 fi
 
 echo "opening $url"
