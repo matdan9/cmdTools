@@ -1,2 +1,24 @@
 #!/bin/sh
-vi ~/.tasks
+
+DIR="$HOME/.task"
+
+if [ ! -d "$DIR" ]; then
+	echo "Task was never used ..."
+	echo "Preparing environment for task"
+	sleep 2s
+	mkdir -p $DIR
+fi
+
+if [ -z ${1} ]; then 
+	vi "${DIR}/task"
+	exit
+fi
+
+if [ "$1" = "ls" ]; then
+	echo "\n--- YOUR TASKS ---\n"
+	ls -l "${DIR}"
+	echo "\n"
+	exit
+fi
+
+vi "${DIR}/${1}"
