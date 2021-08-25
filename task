@@ -21,4 +21,10 @@ if [ "$1" = "ls" ]; then
 	exit
 fi
 
+if [ "$1" = "rm" ]; then
+	rm "${DIR}/${2}"
+	echo "Deleting ${2}"
+	exit
+fi
+
 vi "${DIR}/${1}"
