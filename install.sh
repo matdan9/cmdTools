@@ -1,11 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
-for entry in *
+DIR="$(cd $(dirname $0) && pwd)"
+
+for ENTRY in $DIR/*
 do
-	if [ $entry = "install.sh" ]; then
+	if [ $ENTRY = "${ENTRY}/install.sh" ]; then
 		continue
 	fi
-	ln -sf $(pwd)/$entry "/usr/local/bin/$entry"
-	echo $(pwd)/$entry
+	chmod a+x $ENTRY
+	ln -sf $ENTRY "/usr/local/bin/$(basename $ENTRY)"
+	echo $ENTRY
 done
 
