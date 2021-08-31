@@ -1,0 +1,10 @@
+#/usr/bin/env sh
+
+declare -a savers=(
+	"cmatrix -b"
+	"asciiquarium"
+)
+
+N=$(( ( RANDOM %  ${#savers[@]} ) ))
+
+eval ${savers[${N}]}
