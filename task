@@ -10,7 +10,7 @@ if [ ! -d "$DIR" ]; then
 fi
 
 if [ -z ${1} ]; then 
-	vi "${DIR}/task"
+	vi -c "set ft=markdown" "${DIR}/task"
 	exit
 fi
 
@@ -27,4 +27,4 @@ if [ "$1" = "rm" ]; then
 	exit
 fi
 
-vi "${DIR}/${1}"
+vi -c "set ft=markdown" "${DIR}/${1}"
