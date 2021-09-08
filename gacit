@@ -1,7 +1,9 @@
 #!/bin/sh
+dom="http://george-abitbol.fr"
 
-line=$(curl "http://george-abitbol.fr/" | grep http://www.youtube.com/)
+line=$(curl $dom | grep "<video")
 url=$(echo $line | cut -d "\"" -f 4)
+url="${dom}/$(echo $url | cut -d "/" -f2-)"
 echo $url
-mpv $url
+open $url
 
