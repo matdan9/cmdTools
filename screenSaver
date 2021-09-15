@@ -1,5 +1,16 @@
 #/usr/bin/env sh
 
+if command -V pmset &> /dev/null
+then
+	power=$(echo $(pmset -g batt) | cut -d "'" -f 2)
+	echo $power
+	if [ "$power" = "Battery Power" ]
+	then
+		echo on battery saving
+		exit
+	fi
+fi
+
 declare -a savers=(
 	"cmatrix -b"
 	"asciiquarium"
