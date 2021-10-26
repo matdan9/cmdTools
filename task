@@ -48,8 +48,19 @@ if [ "$1" = "-g" ]; then
 		return
 	fi
 	echo git sync failed
+	exit
 fi
 
-
+if [ "$1" = "--help" ]; then
+	echo task [command] [task_name]
+	echo
+	echo enter name of new task or existing task to modify
+	echo ls:        list available tasks
+	echo rm [task]: removes a task
+	echo -g [url]:  will sync up with indicated git remote
+	echo --help:    display this message
+	echo
+	exit
+fi
 
 openTask "${DIR}/${1}"
