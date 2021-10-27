@@ -3,9 +3,12 @@
 DIR="$HOME/.task"
 
 openTask(){
+	if [ -d "$DIR/.git" ]; then
+		git pull
+	fi
 	vi -c "set ft=markdown" "${1}"
 	if [ -d "$DIR/.git" ]; then
-		if [ git add ${1} && git commit -m "$(date)" && git push ]; then
+		if git add ${1} && git commit -m "$(date)" && git push ; then
 			echo pushed to remote
 		else
 			echo failed to push to remote
@@ -17,7 +20,7 @@ openTask(){
 if [ ! -d "$DIR" ]; then
 	echo "Task was never used ..."
 	echo "Preparing environment for task"
-	sleep 2s
+	sleep 2
 	mkdir -p $DIR
 fi
 
@@ -42,10 +45,13 @@ fi
 if [ "$1" = "-g" ]; then
 	echo "This operation will overwirte you current tasks"
 	echo "We are making a backup in ~/taskBakup"
-	sleep 5s
-	if [ cp --backup ~/.task ~/taskBackup && git clone $2 -0 ~/.task ]; then
+	sleep 5
+	if mv ~/.task ~/taskBackup$(date|tr '\ ' '_') && git clone $2 ~/.task ; then
 		echo git sync was successfull
-		return
+		git add *
+		git commit -m "sync with $(hostname)"
+		git push
+		exit
 	fi
 	echo git sync failed
 	exit
