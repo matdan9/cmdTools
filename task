@@ -3,12 +3,17 @@
 DIR="$HOME/.task"
 
 openTask(){
+# FIXME this is way too slow
 	if [ -d "$DIR/.git" ]; then
-		git pull
+		git -C ${DIR} pull 
 	fi
 	vi -c "set ft=markdown" "${1}"
+	closeTask $1 -&
+}
+
+closeTask(){
 	if [ -d "$DIR/.git" ]; then
-		if git add ${1} && git commit -m "$(date)" && git push ; then
+		if git -C $DIR add ${1} &> /dev/null && git -C $DIR commit -m "$(date)" &> /dev/null  && git -C ${DIR} push &> /dev/null ; then
 			echo pushed to remote
 		else
 			echo failed to push to remote
@@ -38,6 +43,13 @@ fi
 
 if [ "$1" = "rm" ]; then
 	rm "${DIR}/${2}"
+	if [ -d "${DRI}/.git" ]; then
+		if git -C ${DIR} rm ${2} && git -C ${DIR} commit -m "removing $2 $(date)" && git -C ${DIR} push ; then
+			echo git delete sync successfull
+		else
+			echo git delete sync failed
+		fi
+	fi
 	echo "Deleting ${2}"
 	exit
 fi
@@ -48,9 +60,9 @@ if [ "$1" = "-g" ]; then
 	sleep 5
 	if mv ~/.task ~/taskBackup$(date|tr '\ ' '_') && git clone $2 ~/.task ; then
 		echo git sync was successfull
-		git add *
-		git commit -m "sync with $(hostname)"
-		git push
+		git -C ${DIR} add *
+		git -C ${DIR} commit -m "sync with $(hostname)"
+		git -C ${DIR} push
 		exit
 	fi
 	echo git sync failed
