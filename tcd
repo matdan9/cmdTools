@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 
-tmux command-prompt "attach -c $1"
+cd $1
+tmux command-prompt "attach -c $(pwd)"
