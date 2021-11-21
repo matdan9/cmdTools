@@ -13,7 +13,7 @@ openTask(){
 
 closeTask(){
 	if [ -d "$DIR/.git" ]; then
-		if git -C $DIR add ${1} &> /dev/null && git -C $DIR commit -m "$(date)" &> /dev/null  && git -C ${DIR} push &> /dev/null ; then
+		if git -C $DIR add ${1} &> /dev/null && git -C $DIR commit -m "$(date)" &> /dev/null && git -C ${DIR} push &> /dev/null ; then
 			echo pushed to remote
 		else
 			echo failed to push to remote
