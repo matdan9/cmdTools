@@ -2,12 +2,17 @@
 
 DIR="$HOME/.task"
 
+if [ -z "${EDITOR}" ]; then
+	EDITOR="vi"
+	echo no editor selected! using vi
+fi
+
 openTask(){
 # FIXME this is way too slow
 	if [ -d "$DIR/.git" ]; then
 		git -C ${DIR} pull 
 	fi
-	vi -c "set ft=markdown" "${1}"
+	$EDITOR -c "set ft=markdown" "${1}"
 	closeTask $1 -&
 }
 
