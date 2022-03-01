@@ -1,0 +1,11 @@
+#!/bin/sh
+
+xinput --set-prop 10 'libinput Accel Profile Enabled' 0, 1
+xinput --set-prop 8 'libinput Accel Profile Enabled' 0, 1
+# xinput --set-prop 9 'libinput Accel Profile Enabled' 0, 1
+# xinput --set-prop 9 'libinput Accel Profile Enabled' 0, 1
+xset mouse 3 3
+
+# Set keyboard key repeat
+xset r rate 200 30
+
