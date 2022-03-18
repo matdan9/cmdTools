@@ -1,9 +1,11 @@
 #!/bin/sh
 
-xinput --set-prop 10 'libinput Accel Profile Enabled' 0, 1
-xinput --set-prop 8 'libinput Accel Profile Enabled' 0, 1
-# xinput --set-prop 9 'libinput Accel Profile Enabled' 0, 1
-# xinput --set-prop 9 'libinput Accel Profile Enabled' 0, 1
+xinput | grep Mouse | cut -d "=" -f 2 | cut -d "[" -f 1 | while read mId
+do 
+	xinput --set-prop  $mId 'libinput Accel Profile Enabled' 0, 1
+	echo "xinput --set-prop  $mId 'libinput Accel Profile Enabled' 0, 1"
+done
+
 xset mouse 3 3
 
 # Set keyboard key repeat
