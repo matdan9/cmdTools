@@ -12,7 +12,7 @@ do
 	do
 		if [ -z "$l" ]; then continue; fi
 		add=$(($add + $(echo $l | cut -d " " -f1 )))
-		del=$(($add + $(echo $l | cut -d " " -f2 )))
+		del=$(($del + $(echo $l | cut -d " " -f2 )))
 	done <<< $(git log --all --numstat --pretty="%H" --author "$u" | grep "^\([0-9]\{1,\}\s\{1,\}\)\{2\}.*")
 	echo -e "$u\n\e[32mAdd: $add\n\e[31mDel: $del\e[0m\n"
 done
