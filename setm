@@ -1,0 +1,13 @@
+#!/bin/sh
+
+xinput | grep Mouse | cut -d "=" -f 2 | cut -d "[" -f 1 | while read mId
+do 
+	xinput --set-prop  $mId 'libinput Accel Profile Enabled' 0, 1
+	echo "xinput --set-prop  $mId 'libinput Accel Profile Enabled' 0, 1"
+done
+
+xset mouse 3 3
+
+# Set keyboard key repeat
+xset r rate 200 30
+
