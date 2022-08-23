@@ -1,8 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 users=$(git shortlog -s)
 i=2
 step=2
+
+RED="\033[31m"
+GREEN="\033[32m"
+RESET="\033[0m"
 
 git shortlog -s | sed "s/^ *[0-9]\{1,\} *//g" | while read u;
 do
@@ -14,5 +18,5 @@ do
 		add=$(($add + $(echo $l | cut -d " " -f1 )))
 		del=$(($del + $(echo $l | cut -d " " -f2 )))
 	done <<< $(git log --all --numstat --pretty="%H" --author "$u" | grep "^\([0-9]\{1,\}\s\{1,\}\)\{2\}.*")
-	echo -e "$u\n\e[32mAdd: $add\n\e[31mDel: $del\e[0m\n"
+	echo -e "${u}\n${GREEN}Add: ${add}\n${RED}Del: ${del}${RESET}\n"
 done

@@ -13,6 +13,7 @@ fi
 
 declare -a savers=(
 	"cmatrix -b"
+	"asciiquarium"
 	"htop"
 )
 

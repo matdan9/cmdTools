@@ -13,5 +13,6 @@ then
 	exit
 fi
 
-pandoc $1 --from=gfm -t html -o /tmp/semdtmp.html
+pandoc --mathjax -t html $1 -s -o /tmp/semdtmp.html
+# pandoc $1 --from=gfm -t html -o /tmp/semdtmp.html
 firefox --new-tab file:///tmp/semdtmp.html
