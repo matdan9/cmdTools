@@ -6,4 +6,4 @@ read PASSWORD
 stty echo
 printf "\n"
 
-sudo mount -t cifs //raspberrypi/sambashare ~/mnt/nas -o username=mdnas,password="$PASSWORD"
+sudo mount -t cifs //192.168.0.126/sambashare ~/mnt/nas -o username=mdnas,password="$PASSWORD"
