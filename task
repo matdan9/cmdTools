@@ -13,7 +13,7 @@ openTask(){
 		git -C ${DIR} pull 
 	fi
 	$EDITOR -c "set ft=markdown" "${1}"
-	closeTask $1 -&
+	closeTask $1
 }
 
 closeTask(){
