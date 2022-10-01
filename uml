@@ -1,0 +1,17 @@
+#!/bin/sh
+
+if ! command -v plantuml&> /dev/null
+then
+	echo requires plantuml
+	echo you can install it with homebrew and most package manager
+	exit
+fi
+
+if ! command -v firefox &> /dev/null
+then
+	echo requires firefox
+	exit
+fi
+
+plantuml -tsvg $1
+#firefox --new-tab file:///tmp/uml.sv)g

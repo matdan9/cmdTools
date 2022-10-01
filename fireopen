@@ -1,0 +1,4 @@
+#!/bin/sh
+
+firefox --new-tab file:///$(pwd)/$1
+
