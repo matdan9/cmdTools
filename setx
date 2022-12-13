@@ -2,5 +2,5 @@
 
 file=$(echo $1 | cut -d "." -f2)
 echo $file
-pdflatex $1
-firefox "./${file}.pdf"
+pdflatex -halt-on-error $1
+#firefox "./${file}.pdf"

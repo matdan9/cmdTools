@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# inspred by rwxrob https://rwx.gg/tools/editors/vi/how/magic/
+
+while IFS='$\n' read -r line; do
+	if [ -z ${1+x} ]; then
+		echo "# ${line}"
+	else
+		echo "${1} ${line}"
+	fi
+done

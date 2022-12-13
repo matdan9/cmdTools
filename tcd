@@ -1,4 +1,10 @@
 #!/usr/bin/env sh
 
 cd $1
-tmux command-prompt "attach -c $(pwd)"
+#session="$(tmux display-message -p '#S')"
+#tmux a -t $session -c $(pwd) && exit;
+#tmux command-prompt "detach-client && attach-session -t $session"
+#tmux a -t $session
+#tmux command-prompt "attach-session -t $session -c $(pwd)"
+#tmux command-prompt "switch-client -c $(pwd)"
+tmux command-prompt "attach-session -t . -c ${pwd}"
