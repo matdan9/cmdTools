@@ -86,4 +86,15 @@ if [ "$1" = "--help" ]; then
 	exit
 fi
 
+if [ "$1" = "open" ]; then
+	f="${2}"
+	if [ -z ${2} ]; then
+		f="task"
+	fi
+	echo ${f}
+	pandoc "${DIR}/${f}" --from=gfm -t html -o /tmp/taskmd.html
+	firefox --new-tab file:///tmp/taskmd.html
+	exit
+fi
+
 openTask "${DIR}/${1}"
