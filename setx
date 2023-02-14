@@ -1,6 +1,8 @@
 #!/bin/sh
 
-file=$(echo $1 | cut -d "." -f2)
+dir="$(cd $(dirname $1) && pwd)"
+file=${1%.*}
 echo $file
-pdflatex -halt-on-error $1
-#firefox "./${file}.pdf"
+echo $dir
+[ ! -d "$dir/setxBuild" ] && mkdir "$dir/setxBuild"
+pdflatex -output-directory="$dir/setxBuild" -halt-on-error $1
