@@ -1,4 +1,8 @@
 #!/bin/sh
 
-firefox --new-tab file:///$(pwd)/$1
+for entry in "${@}"
+do
+	echo $entry
+	firefox --new-tab file:///$(pwd)/$entry
+done
 
