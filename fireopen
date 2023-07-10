@@ -3,6 +3,6 @@
 for entry in "${@}"
 do
 	echo $entry
-	firefox --new-tab file:///$(pwd)/$entry
+	firefox --new-tab file:///$(pwd)/"$entry"
 done
 
