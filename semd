@@ -14,5 +14,6 @@ then
 fi
 
 #pandoc --mathjax -t html $1 -s -o /tmp/semdtmp.html
-pandoc $1 --from=gfm -t html -o /tmp/semdtmp.html
+pandoc $1 -s -from=gfm -t html -o /tmp/semdtmp.html --mathjax
+#pandoc $1 --from=gfm -t html -o /tmp/semdtmp.html --mathjax
 firefox --new-tab file:///tmp/semdtmp.html
