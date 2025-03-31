@@ -1,2 +1,2 @@
 #!/bin/sh
-discord --enable-features=UseOzonePlatform --ozone-platform=wayland
+discord-canary --enable-features=UseOzonePlatform --ozone-platform=wayland

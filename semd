@@ -21,6 +21,6 @@ else
 	out=$2
 fi
 
-pandoc $1 --mathjax -f markdown-implicit_figures -o $out
+pandoc $1 --mathjax --number-sections -f markdown-implicit_figures -o $out
 # pandoc $1 --from=gfm -t html -o /tmp/semdtmp.html
 # firefox --new-tab file:///tmp/semdtmp.html

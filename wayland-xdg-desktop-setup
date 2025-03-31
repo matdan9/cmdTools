@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# source: https://wiki.hyprland.org/Hypr-Ecosystem/xdg-desktop-portal-hyprland/
+
+# This script is intended to be executed at the launch of hyprland. It startes
+# xdg-desktop-portal-hyprland which allows the usage of D-Bus to communicate
+# between the compositor and the applications
+
+sleep 1
+killall -e xdg-desktop-portal-hyprland
+killall xdg-desktop-portal
+/usr/lib/xdg-desktop-portal-hyprland &
+sleep 2
+/usr/lib/xdg-desktop-portal &
