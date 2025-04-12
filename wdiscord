@@ -1,2 +1,2 @@
 #!/bin/sh
-discord-canary --enable-features=UseOzonePlatform --ozone-platform=wayland
+discord --enable-features=UseOzonePlatform --ozone-platform=wayland --disable-gpu-compositing
