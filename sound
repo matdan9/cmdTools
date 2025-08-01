@@ -1,0 +1,4 @@
+#!/bin/sh
+
+ID=$(wpctl status -n | /bin/grep "[0-9]*\. .*output.*vol" | wofi --gtk-dark --show dmenu | /bin/grep -oP "[0-9]*\. " | sed "s/\.//g") && wpctl set-default $ID
+
