@@ -1,0 +1,3 @@
+#/bin/sh
+
+ID=$(playerctl -l | wofi --gtk-dark --show dmenu) && playerctl play-pause -p $ID
