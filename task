@@ -2,31 +2,6 @@
 
 DIR="$HOME/.task"
 
-if [ -z "${EDITOR}" ]; then
-	EDITOR="vi"
-	echo no editor selected! using vi
-fi
-
-openTask(){
-# FIXME this is way too slow
-	if [ -d "$DIR/.git" ]; then
-		git -C ${DIR} pull 
-	fi
-	$EDITOR -c "set ft=markdown" "${1}"
-	closeTask $1
-}
-
-closeTask(){
-	if [ -d "$DIR/.git" ]; then
-		if git -C $DIR add ${1} &> /dev/null && git -C $DIR commit -m "$(date)" &> /dev/null && git -C ${DIR} push &> /dev/null ; then
-			echo pushed to remote
-		else
-			echo failed to push to remote
-		fi
-	fi
-}
-
-
 if [ ! -d "$DIR" ]; then
 	echo "Task was never used ..."
 	echo "Preparing environment for task"
@@ -34,59 +9,83 @@ if [ ! -d "$DIR" ]; then
 	mkdir -p $DIR
 fi
 
-if [ -z ${1} ]; then 
-	openTask "${DIR}/task"
-	exit
+if [ -z "${EDITOR}" ]; then
+	EDITOR="vi -c set ft=markdown"
+	echo no editor selected! using vi
 fi
 
-if [ "$1" = "ls" ]; then
+help() {
+	echo task [command] [task_name]
+	echo
+	echo enter name of new task or existing task to modify
+	echo ls:	  list available tasks
+	echo rm [task]:   removes a task
+	echo -g [url]:	  will sync up with indicated git remote
+	echo open [task]: will open task in firefox instead of editor
+	echo --help:	  display this message
+	echo
+}
+
+_task() {
+	local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="--help ls rm open -g"
+
+    if [[ ${cur} == -* ]] ; then
+	COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+	return 0
+    fi
+}
+
+openTask(){
+# FIXME this is way too slow
+	if [ -z ${1} ]; then
+		echo "No task provided"
+		return
+	fi
+	FILE="${1}"
+	echo "Opening ${FILE}"
+	if [[ "${FILE}" != *.md ]]; then
+		FILE="${FILE}.md"
+	fi
+	cd $DIR
+	$EDITOR "${FILE}"
+}
+
+listTask() {
 	echo "\n--- YOUR TASKS ---\n"
 	ls -l "${DIR}"
 	echo "\n"
-	exit
-fi
+}
 
-if [ "$1" = "rm" ]; then
-	rm "${DIR}/${2}"
-	if [ -d "${DRI}/.git" ]; then
-		if git -C ${DIR} rm ${2} && git -C ${DIR} commit -m "removing $2 $(date)" && git -C ${DIR} push ; then
-			echo git delete sync successfull
-		else
-			echo git delete sync failed
-		fi
-	fi
-	echo "Deleting ${2}"
+removeTask() {
+	rm "${DIR}/${1}"
+	echo "Deleting ${1}"
 	exit
-fi
+}
 
-if [ "$1" = "-g" ]; then
+initGit() {
 	echo "This operation will overwirte you current tasks"
 	echo "We are making a backup in ~/taskBakup"
 	sleep 5
-	if mv ~/.task ~/taskBackup$(date|tr '\ ' '_') && git clone $2 ~/.task ; then
+	if [ -z ${1} ]; then
+		echo "No git url provided"
+		return
+	fi
+	if mv ~/.task ~/taskBackup$(date|tr '\ ' '_') && git clone ${1} ~/.task ; then
 		echo git sync was successfull
 		git -C ${DIR} add *
 		git -C ${DIR} commit -m "sync with $(hostname)"
 		git -C ${DIR} push
-		exit
+		return
 	fi
-	echo git sync failed
-	exit
-fi
+	echo "git sync failed"
+	return
+}
 
-if [ "$1" = "--help" ]; then
-	echo task [command] [task_name]
-	echo
-	echo enter name of new task or existing task to modify
-	echo ls:        list available tasks
-	echo rm [task]: removes a task
-	echo -g [url]:  will sync up with indicated git remote
-	echo --help:    display this message
-	echo
-	exit
-fi
-
-if [ "$1" = "open" ]; then
+render() {
 	f="${2}"
 	if [ -z ${2} ]; then
 		f="task"
@@ -94,7 +93,63 @@ if [ "$1" = "open" ]; then
 	echo ${f}
 	pandoc "${DIR}/${f}" --from=gfm -t html -o /tmp/taskmd.html
 	firefox --new-tab file:///tmp/taskmd.html
-	exit
-fi
+}
 
-openTask "${DIR}/${1}"
+
+pullFromRemote() {
+	if [ -d "$DIR/.git" ]; then
+		git -C ${DIR} pull 
+	fi
+}
+
+pushToRemote() {
+	FILES='$(git status -s | sed "s/ \([A-Z]*\) \(.*\)/\1-\2/g")'
+	COMMIT_MSG="$(cat /etc/hostname)-${FILES}"
+	if [ -d "$DIR/.git" ]; then
+		if git -C $DIR add -A &> /dev/null && git -C $DIR commit -m "${COMMIT_MSG}" &> /dev/null && git -C ${DIR} push &> /dev/null ; then
+			echo pushed to remote
+		else
+			echo failed to push to remote
+		fi
+	fi
+}
+
+main() {
+	pullFromRemote
+
+	if [ -z "$1" ]; then
+		help
+		openTask "task"
+		exit
+	fi
+
+	case "$1" in
+		"ls")
+			listTask
+			;;
+		"rm")
+			removeTask "$2"
+			;;
+		"open")
+			openTask "$2"
+			;;
+		"-g")
+			initGit "$2"
+			;;
+		"--help")
+			help
+			;;
+		"render")
+			render "$@"
+			;;
+		*)
+			openTask "$1"
+			;;
+	esac
+
+	pushToRemote
+}
+
+complete -F _task task
+
+main $@
