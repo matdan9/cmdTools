@@ -1,6 +1,44 @@
-#!/bin/sh
+#!/bin/bash
 
 DIR="$HOME/.task"
+
+COMPLETION_SCRIPT='
+#!/bin/bash
+_task() {
+	local cur prev opts files
+	local DIR="$HOME/.task"
+
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	opts="--help ls rm open -g render"
+
+	# Get list of tasks (remove .md extension for completion)
+	if [ -d "$DIR" ]; then
+		files=$(cd "$DIR" 2>/dev/null && ls *.md 2>/dev/null | sed "s/\.md$//")
+	fi
+
+	# Complete commands when typing first argument
+	if [[ ${COMP_CWORD} -eq 1 ]] ; then
+		# Combine commands and task names for first argument
+		COMPREPLY=( $(compgen -W "${opts} ${files}" -- ${cur}) )
+		return 0
+	fi
+
+	# Complete task names for commands that need them
+	case "${prev}" in
+		rm|open|render)
+			COMPREPLY=( $(compgen -W "${files}" -- ${cur}) )
+			return 0
+			;;
+		-g)
+			# No completion for git URLs
+			return 0
+			;;
+	esac
+}
+complete -F _task task
+'
 
 if [ ! -d "$DIR" ]; then
 	echo "Task was never used ..."
@@ -15,32 +53,40 @@ if [ -z "${EDITOR}" ]; then
 fi
 
 help() {
-	echo task [command] [task_name]
+	echo "task [command] [task_name]"
+	echo "enter name of new task or existing task to modify"
 	echo
-	echo enter name of new task or existing task to modify
-	echo ls:	  list available tasks
-	echo rm [task]:   removes a task
-	echo -g [url]:	  will sync up with indicated git remote
-	echo open [task]: will open task in firefox instead of editor
-	echo --help:	  display this message
+	echo "    ls:	         list available tasks"
+	echo "    rm [task]:     removes a task"
+	echo "    -g [url]:	 will sync up with indicated git remote"
+	echo "    open [task]:   will open task in your default editor"
+	echo "    render [task]: will render task as html and open in firefox"
+	echo "    --help:	 display this message"
+	echo "    -complete:     installs the bash completion script for task"
 	echo
 }
 
-_task() {
-	local cur prev opts
-    COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="--help ls rm open -g"
-
-    if [[ ${cur} == -* ]] ; then
-	COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-	return 0
-    fi
+pullFromRemote() {
+	if [ -d "$DIR/.git" ]; then
+		git -C ${DIR} pull
+	fi
 }
+
+pushToRemote() {
+	FILES='$(git status -s | sed "s/ \([A-Z]*\) \(.*\)/\1-\2/g")'
+	COMMIT_MSG="$(cat /etc/hostname)-${FILES}"
+	if [ -d "$DIR/.git" ]; then
+		if git -C $DIR add -A &> /dev/null && git -C $DIR commit -m "${COMMIT_MSG}" &> /dev/null && git -C ${DIR} push &> /dev/null ; then
+			echo pushed to remote
+		else
+			echo failed to push to remote
+		fi
+	fi
+}
+
 
 openTask(){
-# FIXME this is way too slow
+	pullFromRemote
 	if [ -z ${1} ]; then
 		echo "No task provided"
 		return
@@ -52,18 +98,21 @@ openTask(){
 	fi
 	cd $DIR
 	$EDITOR "${FILE}"
+	pushToRemote
 }
 
 listTask() {
+	pullFromRemote
 	echo "\n--- YOUR TASKS ---\n"
 	ls -l "${DIR}"
 	echo "\n"
 }
 
 removeTask() {
+	pullFromRemote
 	rm "${DIR}/${1}"
 	echo "Deleting ${1}"
-	exit
+	pushToRemote
 }
 
 initGit() {
@@ -86,6 +135,7 @@ initGit() {
 }
 
 render() {
+	pullFromRemote
 	f="${2}"
 	if [ -z ${2} ]; then
 		f="task"
@@ -95,27 +145,19 @@ render() {
 	firefox --new-tab file:///tmp/taskmd.html
 }
 
-
-pullFromRemote() {
-	if [ -d "$DIR/.git" ]; then
-		git -C ${DIR} pull 
-	fi
-}
-
-pushToRemote() {
-	FILES='$(git status -s | sed "s/ \([A-Z]*\) \(.*\)/\1-\2/g")'
-	COMMIT_MSG="$(cat /etc/hostname)-${FILES}"
-	if [ -d "$DIR/.git" ]; then
-		if git -C $DIR add -A &> /dev/null && git -C $DIR commit -m "${COMMIT_MSG}" &> /dev/null && git -C ${DIR} push &> /dev/null ; then
-			echo pushed to remote
-		else
-			echo failed to push to remote
-		fi
+install-completion() {
+	COMPLETION_DIR="/usr/share/bash-completion/completions"
+	if [ -d "${COMPLETION_DIR}" ]; then
+		echo "Installing bash completion script for task"
+		echo "${COMPLETION_SCRIPT}" | sudo tee /usr/share/bash-completion/completions/task > /dev/null
+		echo "Bash completion script installed successfully!"
+	else
+		echo "Tried directory: ${COMPLETION_DIR}"
+		echo "Bash completion directory not found. Please install bash-completion package."
 	fi
 }
 
 main() {
-	pullFromRemote
 
 	if [ -z "$1" ]; then
 		help
@@ -142,14 +184,14 @@ main() {
 		"render")
 			render "$@"
 			;;
+		"-complete")
+			install-completion
+			;;
 		*)
 			openTask "$1"
 			;;
 	esac
-
-	pushToRemote
 }
 
-complete -F _task task
 
-main $@
+main "$@"
